@@ -17,7 +17,11 @@ public class PlayerScript : MonoBehaviour
     Vector3 lastPos;
     bool IsMoving;
 
+    public bool goLadder = false;
+    public bool goStairs = false;
+
     public CanvasScript canvasScript;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -28,36 +32,47 @@ public class PlayerScript : MonoBehaviour
         lastPos = myTransform.position;
         IsMoving = false;
 
-
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        StartCoroutine(canvasScript.Prology());
-
-        if (Input.GetMouseButtonDown(0))
+        if (canvasScript.canWalk)
         {
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-
-            if(Physics.Raycast(ray, out hit))
+            if (Input.GetMouseButtonDown(0))
             {
-                //Move agent
-                agent.SetDestination(hit.point);
+                Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit))
+                {
+                    //Move agent
+                    agent.SetDestination(hit.point);
+
+
+                    if (hit.transform.name == "LaddersToAttic")
+                        goLadder = true;
+                    else
+                        goLadder = false;
+
+                    if (hit.transform.name == "StairsToBasement")
+                        goStairs = true;
+                    else
+                        goStairs = false;
+
+                }
             }
         }
 
-        if (myTransform.position != lastPos)
+        if ((transform.position - agent.destination).magnitude - agent.stoppingDistance > 0.1f)
         {
-            Debug.Log("Kävelee");
             anim.SetBool("isWalking", true);
         }
         else
         {
             anim.SetBool("isWalking", false);
         }
-        lastPos = myTransform.position;
     }
 
 
